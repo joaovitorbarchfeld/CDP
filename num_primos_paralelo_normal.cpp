@@ -37,6 +37,7 @@ int main(int argc, char *argv[]) {
         return -1;
     }
 
+
     // Converte os argumentos para inteiros
     int interval = atoi(argv[1]); // Intervalo de números a serem verificados
     int numThreads = atoi(argv[2]); // Número de threads a serem usadas
