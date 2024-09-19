@@ -1,0 +1,21 @@
+set terminal pngcairo size 800,600 enhanced font 'times, 16'
+set output 'execution_time_graph.png'
+
+set title 'Execution Time of a million prime numbers calculation'
+set xlabel 'Number of threads'
+set ylabel 'Execution Time and STDev (seconds)'
+
+set xrange [0.5:12.5]
+set yrange [0.1:100]
+set ytics 10
+set xtics 1
+
+# Specify the input files
+datafile = 'num_primos_fila_concorrente_normal.dat'
+datafile2 = 'num_primos_paralelo_normal.dat'
+
+# Define the plot command
+plot datafile using 1:2 with linespoints linecolor 2 lw 2 notitle, \
+    datafile using 1:2:3 with yerrorbars linecolor 2 lw 2 title 'Fila Concorrente', \
+    datafile2 using 1:2 with linespoints linecolor 3 lw 2 notitle, \
+    datafile2 using 1:2:3 with yerrorbars linecolor 3 lw 2 title 'Paralelo'
