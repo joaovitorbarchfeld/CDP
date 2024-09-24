@@ -4,7 +4,7 @@ if [ ! -d "dats" ]; then
   mkdir dats
 fi
 
-# version=num_primos_paralelo_normal
+version=num_primos_paralelo_normal
 version=num_primos_fila_concorrente_normal
 rm ../plot/$version.dat
 for ((i=1; i<=12; i++))
