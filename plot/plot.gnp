@@ -18,4 +18,4 @@ datafile2 = 'num_primos_paralelo_normal.dat'
 plot datafile using 1:2 with linespoints linecolor 2 lw 2 notitle, \
     datafile using 1:2:3 with yerrorbars linecolor 2 lw 2 title 'Fila Concorrente', \
     datafile2 using 1:2 with linespoints linecolor 3 lw 2 notitle, \
-    datafile2 using 1:2:3 with yerrorbars linecolor 3 lw 2 title 'Paralelo'
+    datafile2 using 1:2:3 with yerrorbars linecolor 3 lw 2 title 'Fila Paralela'
