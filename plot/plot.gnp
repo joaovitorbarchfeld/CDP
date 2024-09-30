@@ -1,21 +1,44 @@
-set terminal pngcairo size 800,600 enhanced font 'times, 16'
+set terminal pngcairo size 1600,600 enhanced font 'times, 16'
 set output 'execution_time_graph.png'
 
 set title 'Execution Time of a million prime numbers calculation'
 set xlabel 'Number of threads'
-set ylabel 'Execution Time and STDev (seconds)'
+set ylabel 'Execution Time (seconds)'
 
+# Configuração para ter dois gráficos lado a lado
+set multiplot layout 1,2 title "CPU vs GPU Execution Time Comparison"
+
+# Primeiro gráfico: CPU
+set title 'CPU Execution Time'
 set xrange [0.5:12.5]
-set yrange [0.1:100]
+set yrange [0.01:100]
+set logscale y
 set ytics 10
 set xtics 1
 
-# Specify the input files
-datafile = 'num_primos_fila_concorrente_normal.dat'
-datafile2 = 'num_primos_paralelo_normal.dat'
+# Arquivos de entrada
+cpu_parallel_file = 'cpu_parallel.dat'
+cpu_concurrent_file = 'cpu_concurrent.dat'
 
-# Define the plot command
-plot datafile using 1:2 with linespoints linecolor 2 lw 2 notitle, \
-    datafile using 1:2:3 with yerrorbars linecolor 2 lw 2 title '(CPU) Fila Concorrente', \
-    datafile2 using 1:2 with linespoints linecolor 3 lw 2 notitle, \
-    datafile2 using 1:2:3 with yerrorbars linecolor 3 lw 2 title '(CPU) Fila Sequencial'
+# Plot para CPU
+plot cpu_parallel_file using 1:2 with linespoints linecolor 2 lw 2 title '(CPU) Paralelo', \
+     cpu_concurrent_file using 1:2 with linespoints linecolor 3 lw 2 title '(CPU) Concorrente'
+
+unset logscale y  # Desativar a escala logarítmica para GPU (ajustável conforme a necessidade)
+
+# Segundo gráfico: GPU
+set title 'GPU Execution Time'
+set xrange [100:900]
+set yrange [0.01:100]
+set ytics 10
+set xtics 128,128,896
+
+# Arquivos de entrada
+gpu_parallel_file = 'gpu_parallel.dat'
+gpu_concurrent_file = 'gpu_concurrent.dat'
+
+# Plot para GPU
+plot gpu_parallel_file using 1:2 with linespoints linecolor 4 lw 2 title '(GPU) Paralelo', \
+     gpu_concurrent_file using 1:2 with linespoints linecolor 5 lw 2 title '(GPU) Concorrente'
+
+unset multiplot

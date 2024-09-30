@@ -15,6 +15,17 @@ bool isPrime(int num) {
     return true;
 }
 
+// Função que processa um bloco de números
+int countPrimesInRange(int start, int end) {
+    int count = 0;
+    for (int i = start; i <= end; ++i) {
+        if (isPrime(i)) {
+            ++count;
+        }
+    }
+    return count;
+}
+
 int main(int argc, char *argv[]) {
     if (argc < 3) {
         std::cout << "Uso: " << argv[0] << " Tamanho do problema num Threads\n";
@@ -32,24 +43,25 @@ int main(int argc, char *argv[]) {
     // Inicia o pool de threads
     ThreadPool threadPool(numThreads);
 
-    // Vetor para armazenar os futuros resultados de cada número testado
-    std::vector<std::future<bool>> results;
+    // Vetor para armazenar os futuros resultados de cada bloco de trabalho
+    std::vector<std::future<int>> results;
+
+    // Tamanho dos blocos de números para dividir o trabalho
+    int blockSize = interval / numThreads;
 
     auto t1 = std::chrono::high_resolution_clock::now();
 
-    // Para cada número dentro do intervalo, enfileiramos uma tarefa para verificar se é primo
-    for (int i = 0; i < interval; ++i) {
-        results.emplace_back(threadPool.enqueue([](int value) {
-            return isPrime(value);
-        }, i));
+    // Enfileirar blocos de números para cada thread
+    for (int i = 0; i < numThreads; ++i) {
+        int start = i * blockSize;
+        int end = (i == numThreads - 1) ? interval : (i + 1) * blockSize - 1;
+        results.emplace_back(threadPool.enqueue(countPrimesInRange, start, end));
     }
 
     // Contagem de primos
     int totalCount = 0;
     for (auto& future : results) {
-        bool prime = future.get(); // Obtemos o resultado da verificação
-        if (prime)
-            ++totalCount;
+        totalCount += future.get(); // Somamos os resultados de cada thread
     }
 
     auto t_end = std::chrono::high_resolution_clock::now();
