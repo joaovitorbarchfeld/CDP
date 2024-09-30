@@ -3,7 +3,7 @@ exec1="num_primos_fila_concorrente_normal"
 exec2="num_primos_paralelo_normal"
 saveLog1="logs/$exec1"
 saveLog2="logs/$exec2"
-problemSize=5000000
+problemSize=1000000
 
 for ((i=1; i<=1; i++)) #10 repetitions
 do
