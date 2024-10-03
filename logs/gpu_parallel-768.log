@@ -1,0 +1,4 @@
+Total de números primos: 5761455
+Tempo de execução (seconds): 9.46977
+Done: num_primos_paralelo_sequencial_cuda
+-----------------------------------

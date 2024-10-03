@@ -11,10 +11,9 @@ set multiplot layout 1,2 title "CPU vs GPU Execution Time Comparison"
 # Primeiro gráfico: CPU
 set title 'CPU Execution Time'
 set xrange [0.5:12.5]
-set yrange [0.01:100]
-set logscale y
-set ytics 10
-set xtics 1
+set yrange [10:100]  # Faixa do eixo Y ajustada para 10 a 100
+set ytics 10  # Mostrar ticks de 10 em 10 no eixo Y
+set xtics 1  # Ticks no eixo X de 1 em 1 (threads)
 
 # Arquivos de entrada
 cpu_parallel_file = 'cpu_parallel.dat'
@@ -24,13 +23,13 @@ cpu_concurrent_file = 'cpu_concurrent.dat'
 plot cpu_parallel_file using 1:2 with linespoints linecolor 2 lw 2 title '(CPU) Paralelo', \
      cpu_concurrent_file using 1:2 with linespoints linecolor 3 lw 2 title '(CPU) Concorrente'
 
-unset logscale y  # Desativar a escala logarítmica para GPU (ajustável conforme a necessidade)
+unset logscale y  # Certifique-se de desativar a escala logarítmica para CPU (se houver)
 
 # Segundo gráfico: GPU
 set title 'GPU Execution Time'
 set xrange [100:900]
-set yrange [0.01:100]
-set ytics 10
+set yrange [1:100]
+set ytics 10  # Manter ticks de 10 em 10 no eixo Y para GPU
 set xtics 128,128,896
 
 # Arquivos de entrada

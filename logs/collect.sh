@@ -13,11 +13,14 @@ for version in "${versions[@]}"; do
   rm -f ../plot/$version.dat
 done
 
-# Coletar dados para CPU (de 1 a 12 threads) e GPU (de 128 a 896 threads)
+# Lista de threads da GPU (incluindo 1 thread)
+gpu_threads=(1 128 192 256 320 384 448 512 576 640 704 768 832)
+
+# Coletar dados para CPU (de 1 a 12 threads) e GPU (com valores de gpu_threads)
 for version in "${versions[@]}"; do
   if [[ "$version" == *gpu* ]]; then
-    # GPU: Iterar de 128 a 896 threads (incremento de 128)
-    for ((i=128; i<=896; i+=128)); do
+    # GPU: Usar a lista de gpu_threads
+    for i in "${gpu_threads[@]}"; do
       log_file="$version-$i.log"
       if [ -f "$log_file" ]; then
         # Coletar tempos de execução dos logs

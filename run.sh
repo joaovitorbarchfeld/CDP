@@ -13,7 +13,7 @@ log_gpu_parallel="logs/gpu_parallel"
 log_gpu_concurrent="logs/gpu_concurrent"
 
 # Parâmetros
-problemSize=10000000
+problemSize=100000000
 
 # Função para executar e salvar a saída padrão no log
 run_and_log() {
@@ -29,28 +29,29 @@ run_and_log() {
 
 # Executa CPU paralelo de 1 a 12 threads
 echo "== Executando CPU Paralelo =="
-for j in {1..12..1}; do
+for j in {1..12}; do
     echo "Running CPU Paralelo with $j threads!"
     run_and_log $exec_cpu_parallel "$problemSize $j" "$log_cpu_parallel-$j.log"
 done
 
-# Executa GPU paralelo de 128 em 128 threads até 896
+# Executa GPU paralelo começando com 1 thread e depois com 12 valores progressivos
 echo "== Executando GPU Paralelo =="
-for j in {1..896..128}; do
+gpu_threads=(1 128 192 256 320 384 448 512 576 640 704 768 832)
+for j in "${gpu_threads[@]}"; do
     echo "Running GPU Paralelo with $j threads!"
     run_and_log $exec_gpu_parallel "$problemSize $j" "$log_gpu_parallel-$j.log"
 done
 
 # Executa CPU concorrente de 1 a 12 threads
 echo "== Executando CPU Concorrente =="
-for j in {1..12..1}; do
+for j in {1..12}; do
     echo "Running CPU Concorrente with $j threads!"
     run_and_log $exec_cpu_concurrent "$problemSize $j" "$log_cpu_concurrent-$j.log"
 done
 
-# Executa GPU concorrente de 128 em 128 threads até 896
+# Executa GPU concorrente começando com 1 thread e depois com 12 valores progressivos
 echo "== Executando GPU Concorrente =="
-for j in {1..896..128}; do
+for j in "${gpu_threads[@]}"; do
     echo "Running GPU Concorrente with $j threads!"
     run_and_log $exec_gpu_concurrent "$problemSize $j" "$log_gpu_concurrent-$j.log"
 done
