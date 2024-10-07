@@ -2,75 +2,85 @@
 #include <cuda_runtime.h>
 #include <chrono>
 
+// Função que verifica se um número é primo, executada na GPU (dispositivo)
 __device__ bool isPrimeDevice(int num) {
     if (num <= 1)
         return false;
 
-    for (int i = 2; i * i <= num; ++i) {
+    for (int i = 2; i * i <= num; ++i) {  // Verifica se num é divisível por i, até a raiz quadrada de num
         if (num % i == 0)
             return false;
     }
     return true;
 }
 
-// Kernel function para verificar números primos em blocos de trabalho
+// Função kernel que será executada na GPU para verificar números primos em intervalos
 __global__ void countPrimesSequential(int start, int end, int* primeCount) {
-    int idx = blockIdx.x * blockDim.x + threadIdx.x; // Índice global da thread
+    // Cálculo do índice global da thread (cada thread tem um índice único dentro do grid)
+    int idx = blockIdx.x * blockDim.x + threadIdx.x;
 
+    // Calcula o número total de valores a serem verificados e distribui o trabalho por thread
     int range = end - start + 1;
     int numbersPerThread = (range + blockDim.x * gridDim.x - 1) / (blockDim.x * gridDim.x);
 
+    // Cada thread calcula o início e fim do intervalo que deve processar
     int threadStart = start + idx * numbersPerThread;
     int threadEnd = min(threadStart + numbersPerThread - 1, end);
 
     int localCount = 0;
+    // Cada thread verifica se os números em seu intervalo são primos
     for (int i = threadStart; i <= threadEnd; ++i) {
         if (isPrimeDevice(i)) {
-            localCount++;
+            localCount++;  // Incrementa o contador local se o número for primo
         }
     }
 
-    atomicAdd(primeCount, localCount);  // Atualização concorrente do contador de primos
+    // Atualiza o contador global de números primos usando atomicAdd (garantindo que várias threads possam atualizar o valor de forma segura)
+    atomicAdd(primeCount, localCount);
 }
 
 int main(int argc, char* argv[]) {
+    // Verifica se o número correto de argumentos foi passado
     if (argc < 3) {
         std::cout << "Uso: " << argv[0] << " <Tamanho do intervalo> <Threads>\n";
         return -1;
     }
 
+    // Lê o intervalo de números a ser verificado e o número de threads por bloco
     int interval = atoi(argv[1]);
     int threadsPerBlock = atoi(argv[2]);
 
-    int primeCountHost = 0;
-    int* primeCountDevice;
+    int primeCountHost = 0;  // Inicializa o contador de primos no host (CPU)
+    int* primeCountDevice;  // Ponteiro para o contador de primos na GPU
 
+    // Aloca memória na GPU para o contador de primos
     cudaMalloc((void**)&primeCountDevice, sizeof(int));
+    // Copia o valor inicial do contador de primos (zero) para a GPU
     cudaMemcpy(primeCountDevice, &primeCountHost, sizeof(int), cudaMemcpyHostToDevice);
 
-    // Definir dimensões do grid e blocos
+    // Calcula o número de blocos no grid necessários para cobrir o intervalo
     int blocksPerGrid = (interval + threadsPerBlock - 1) / threadsPerBlock;
 
-    // Medir o tempo de execução
+    // Medir o tempo de execução (início)
     auto t1 = std::chrono::high_resolution_clock::now();
 
-    // Chamar o kernel na GPU para calcular primos em paralelo
+    // Chama o kernel na GPU para calcular números primos em paralelo
     countPrimesSequential<<<blocksPerGrid, threadsPerBlock>>>(0, interval, primeCountDevice);
 
-    // Sincronizar GPU
+    // Sincroniza a execução da GPU (espera todas as threads terminarem)
     cudaDeviceSynchronize();
 
-    // Medir o tempo de execução após a execução do kernel
+    // Medir o tempo de execução (fim)
     auto t_end = std::chrono::high_resolution_clock::now();
 
-    // Copiar o resultado de volta para a CPU
+    // Copia o valor do contador de primos da GPU de volta para a CPU
     cudaMemcpy(&primeCountHost, primeCountDevice, sizeof(int), cudaMemcpyDeviceToHost);
 
-    // Exibir o número de primos e o tempo de execução
+    // Exibe o número total de primos encontrados e o tempo de execução
     std::cout << "Total de números primos: " << primeCountHost << std::endl;
     std::cout << "Tempo de execução (seconds): " << std::chrono::duration<double>(t_end - t1).count() << std::endl;
 
-    // Liberar a memória na GPU
+    // Libera a memória alocada na GPU
     cudaFree(primeCountDevice);
 
     return 0;

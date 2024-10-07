@@ -1,4 +1,4 @@
-5761455 números primos entre 0 e 100000000
-Tempo de execução (seconds): 48.3742
+26355867 números primos entre 0 e 500000000
+Tempo de execução (seconds): 477.507
 Done: num_primos_paralelo_normal
 -----------------------------------

@@ -1,4 +1,4 @@
-Total de números primos: 5761455
-Tempo de execução (seconds): 8.19387
+Total de números primos: 26355867
+Tempo de execução (seconds): 111.341
 Done: num_primos_fila_concorrente_cuda
 -----------------------------------

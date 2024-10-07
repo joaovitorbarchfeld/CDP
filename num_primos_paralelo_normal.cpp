@@ -8,78 +8,86 @@ bool isPrime(int num) {
    if (num <= 1)
        return false;
 
-   for (int i = 2; i * i <= num; ++i) {  // Checa até a raiz quadrada de 'num'
+   for (int i = 2; i * i <= num; ++i) {  // Checa se 'num' é divisível por qualquer número até sua raiz quadrada
        if (num % i == 0)
            return false;
    }
    return true;
 }
 
-// Função que conta números primos em um intervalo
+// Função que conta números primos em um intervalo dado
 int countPrimesInRange(int start, int end) {
     int localCount = 0;
+    // Verifica cada número no intervalo [start, end] e conta quantos são primos
     for (int i = start; i <= end; ++i) {
         if (isPrime(i))
-            ++localCount;
+            ++localCount;  // Incrementa o contador local se o número for primo
     }
     return localCount;
 }
 
 int main(int argc, char *argv[]) {
+    // Verifica se o número correto de argumentos foi passado
     if (argc < 3) {
         std::cout << "Uso: " << argv[0] << " <Tamanho do problema> <Número de Threads>\n";
         return -1;
     }
 
-    int interval = atoi(argv[1]);
-    int numThreads = atoi(argv[2]);
+    // Converte os argumentos para inteiros
+    int interval = atoi(argv[1]);  // Intervalo de números a serem verificados
+    int numThreads = atoi(argv[2]);  // Número de threads a serem utilizadas
 
+    // Verifica se o número de threads é válido
     if (numThreads <= 0) {
         std::cerr << "O número de threads deve ser maior que zero\n";
         return -1;
     }
 
+    // Marca o tempo de início da execução
     auto t1 = std::chrono::high_resolution_clock::now();
 
-    // Vetores para armazenar threads e os resultados locais de cada thread
+    // Vetores para armazenar as threads e os contadores locais de primos
     std::vector<std::thread> threads;
-    std::vector<int> localCounts(numThreads, 0);
+    std::vector<int> localCounts(numThreads, 0);  // Inicializa um contador para cada thread
 
-    // Divisão do intervalo de forma balanceada entre as threads
-    int chunkSize = interval / numThreads;
-    int remaining = interval % numThreads;  // Para distribuir o restante
+    // Divide o intervalo de números de forma balanceada entre as threads
+    int chunkSize = interval / numThreads;  // Tamanho de cada pedaço que cada thread vai processar
+    int remaining = interval % numThreads;  // Resto para ajustar o número de threads (se não for divisível)
 
-    int start = 0;
+    int start = 0;  // Ponto de início do intervalo para a primeira thread
     
+    // Criação das threads
     for (int i = 0; i < numThreads; ++i) {
-        // Ajustar o tamanho da última thread para cobrir todo o intervalo
+        // Calcula o fim do intervalo para cada thread
         int end = start + chunkSize - 1;
         if (i < remaining) {
-            end++;  // Distribuir sobras entre as primeiras threads
+            end++;  // Distribui o "resto" do intervalo entre as primeiras threads
         }
 
-        // Criar uma thread para processar o intervalo [start, end]
+        // Cria uma thread para processar o intervalo [start, end]
         threads.emplace_back([&localCounts, i, start, end]() {
-            localCounts[i] = countPrimesInRange(start, end);
+            localCounts[i] = countPrimesInRange(start, end);  // Cada thread armazena seu resultado no vetor localCounts
         });
 
-        start = end + 1;  // Atualizar o ponto de início para a próxima thread
+        // Atualiza o ponto de início para a próxima thread
+        start = end + 1;
     }
 
-    // Aguardar o término de todas as threads
+    // Aguarda o término de todas as threads
     for (auto& thread : threads) {
         thread.join();
     }
 
-    // Somar os resultados de todas as threads
+    // Soma os resultados locais de todas as threads para obter o número total de primos
     int totalCount = 0;
     for (int count : localCounts) {
-        totalCount += count;
+        totalCount += count;  // Soma os resultados de cada thread
     }
 
+    // Marca o tempo de término da execução
     auto t_end = std::chrono::high_resolution_clock::now();
 
-    // Exibir o número total de primos encontrados e o tempo de execução
+    // Exibe o número total de primos encontrados e o tempo de execução
     std::cout << totalCount << " números primos entre 0 e " << interval << std::endl;
     std::cout << "Tempo de execução (seconds): " << std::chrono::duration<double>(t_end - t1).count() << std::endl;
 
