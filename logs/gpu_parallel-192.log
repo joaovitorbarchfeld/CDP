@@ -1,4 +1,4 @@
 Total de números primos: 26355867
-Tempo de execução (seconds): 90.1564
+Tempo de execução (seconds): 89.4355
 Done: num_primos_paralelo_sequencial_cuda
 -----------------------------------

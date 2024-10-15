@@ -1,4 +1,4 @@
 26355867 números primos entre 0 e 500000000
-Tempo de execução (seconds): 213.704
+Tempo de execução (seconds): 197.376
 Done: num_primos_fila_concorrente_normal
 -----------------------------------

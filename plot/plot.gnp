@@ -1,7 +1,10 @@
-set terminal pngcairo size 1600,600 enhanced font 'times, 16'
+set terminal pngcairo size 1600,800 enhanced font 'times, 16'  # Dimensão mantida para gráficos claros
 set output 'execution_time_graph.png'
 
+# Título principal do gráfico
 set title 'Execution Time of a million prime numbers calculation'
+
+# Rótulos dos eixos
 set xlabel 'Number of threads'
 set ylabel 'Execution Time (seconds)'
 
@@ -10,34 +13,34 @@ set multiplot layout 1,2 title "CPU vs GPU Execution Time Comparison"
 
 # Primeiro gráfico: CPU
 set title 'CPU Execution Time'
-set xrange [0.5:12.5]
-set yrange [0:1200]  # Faixa do eixo Y para CPU ajustada até 1200 segundos
-set ytics 100  # Mostrar ticks de 100 em 100 no eixo Y
-set xtics 1  # Ticks no eixo X de 1 em 1 (threads)
+set xrange [0.5:12.5]  # Define o intervalo de 1 a 12 threads para a CPU
+set yrange [0:1200]    # Faixa do eixo Y para CPU ajustada até 1200 segundos
+set ytics 100          # Mostrar ticks de 100 em 100 no eixo Y
+set xtics 1            # Ticks no eixo X de 1 em 1 (threads)
 
-# Arquivos de entrada
+# Arquivos de entrada para CPU
 cpu_parallel_file = 'cpu_parallel.dat'
 cpu_concurrent_file = 'cpu_concurrent.dat'
 
-# Plot para CPU
+# Plot para CPU (modo paralelo e concorrente)
 plot cpu_parallel_file using 1:2 with linespoints linecolor 2 lw 2 title '(CPU) Paralelo', \
      cpu_concurrent_file using 1:2 with linespoints linecolor 3 lw 2 title '(CPU) Concorrente'
 
-unset logscale y  # Certifique-se de desativar a escala logarítmica para CPU
+unset logscale y  # Desativa escala logarítmica para CPU
 
 # Segundo gráfico: GPU
 set title 'GPU Execution Time'
-set xrange [100:900]
-set yrange [0:200]  # Faixa do eixo Y para GPU ajustada até 200 segundos
-set ytics 20  # Mostrar ticks de 20 em 20 no eixo Y
-set xtics 128,128,896
+set xrange [64:832]   # Define o intervalo de threads da GPU de 64 a 832 threads
+set yrange [0:200]    # Faixa do eixo Y para GPU ajustada até 200 segundos
+set ytics 20          # Mostrar ticks de 20 em 20 no eixo Y
+set xtics 64,64,832   # Ticks no eixo X em intervalos de 64 threads
 
-# Arquivos de entrada
+# Arquivos de entrada para GPU
 gpu_parallel_file = 'gpu_parallel.dat'
 gpu_concurrent_file = 'gpu_concurrent.dat'
 
-# Plot para GPU
+# Plot para GPU (modo paralelo e concorrente)
 plot gpu_parallel_file using 1:2 with linespoints linecolor 4 lw 2 title '(GPU) Paralelo', \
      gpu_concurrent_file using 1:2 with linespoints linecolor 5 lw 2 title '(GPU) Concorrente'
 
-unset multiplot
+unset multiplot  # Finaliza multiplot
